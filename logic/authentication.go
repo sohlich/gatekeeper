@@ -5,8 +5,8 @@ import (
 
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
-	"github.com/sohlich/attendence/mail"
-	"github.com/sohlich/attendence/model"
+	"github.com/sohlich/gatekeeper/mail"
+	"github.com/sohlich/gatekeeper/model"
 	"golang.org/x/crypto/bcrypt"
 )
 

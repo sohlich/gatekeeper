@@ -11,9 +11,9 @@ import (
 	"github.com/braintree/manners"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/pkg/errors"
-	"github.com/sohlich/attendence/handlers"
-	"github.com/sohlich/attendence/mail"
-	"github.com/sohlich/attendence/model"
+	"github.com/sohlich/gatekeeper/handlers"
+	"github.com/sohlich/gatekeeper/mail"
+	"github.com/sohlich/gatekeeper/model"
 )
 
 func main() {

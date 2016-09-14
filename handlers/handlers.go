@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/sohlich/attendence/logic"
-	"github.com/sohlich/attendence/model"
+	"github.com/sohlich/gatekeeper/logic"
+	"github.com/sohlich/gatekeeper/model"
 )
 
 type UserHandler func(u *model.User, rw http.ResponseWriter)
