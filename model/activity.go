@@ -21,17 +21,33 @@ func (a *Activity) TableName() string {
 	return "activity"
 }
 
+type ActivityManager interface {
+	Save(a *Activity) error
+	FindByToken(tkn string) (*Activity, error)
+}
+
+type SQLActivityManager struct {
+	db *gorm.DB
+}
+
+func (s *SQLActivityManager) Save(a *Activity) error {
+	return db.Save(a).Error
+}
+
+func (s *SQLActivityManager) FindByToken(tkn string) (a *Activity, err error) {
+	a = &Activity{}
+	err = db.Where("token = ?", tkn).First(a).Error
+	return
+}
+
 func FindActivityByToken(tkn string) (*Activity, error) {
-	act := &Activity{}
-	err := db.Where("token = ?", tkn).First(act).Error
-	return act, err
+	return activityStorage.FindByToken(tkn)
 }
 
 func CreateActivity(a *Activity) error {
-	return db.Begin().Create(a).
-		Commit().Error
+	return activityStorage.Save(a)
 }
 
 func UpdateActivity(a *Activity) error {
-	return db.Save(a).Error
+	return activityStorage.Save(a)
 }

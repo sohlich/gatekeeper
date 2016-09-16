@@ -23,6 +23,32 @@ type User struct {
 	LastAccess int64
 }
 
+type UserManager interface {
+	Save(u *User) error
+	FindByID(id uint) (*User, error)
+	FindByUserID(userID string) (*User, error)
+}
+
+type SqlUserManager struct {
+	db *gorm.DB
+}
+
+func (s *SqlUserManager) Save(u *User) error {
+	return s.db.Save(u).Error
+}
+
+func (s *SqlUserManager) FindByID(id uint) (u *User, err error) {
+	u = &User{}
+	err = s.db.First(u, id).Error
+	return
+}
+
+func (s *SqlUserManager) FindByUserID(userID string) (u *User, err error) {
+	u = &User{}
+	err = s.db.Where("userid = ?", userID).First(u).Error
+	return
+}
+
 func (u *User) Stringer() string {
 	if u != nil {
 		return u.UserID
@@ -56,15 +82,8 @@ func CreateUser(u *User) (err error) {
 
 	log.Printf("Got password: %v\n", bytes)
 	u.Password = string(bytes)
-	err = InserUser(u)
+	err = userStorage.Save(u)
 	return errors.Wrap(err, "Cannot create user")
-}
-
-func InserUser(u *User) error {
-	return db.Begin().
-		Create(u).
-		Commit().
-		Error
 }
 
 func FindUserByUserid(userID string) (user User) {
@@ -73,22 +92,13 @@ func FindUserByUserid(userID string) (user User) {
 }
 
 func FindUserByID(id uint) (*User, error) {
-	u := &User{}
-	return u, db.First(u, id).Error
-}
-
-func DeactivateUser(userID string) error {
-	return db.Where("userid = ?", userID).
-		Delete(&User{}).
-		Commit().Error
+	return userStorage.FindByID(id)
 }
 
 func SaveUser(u *User) error {
-	return db.Save(u).Error
+	return userStorage.Save(u)
 }
 
 func FindUserByActivity(a *Activity) (*User, error) {
-	u := &User{}
-	err := db.First(u, a.UserID).Error
-	return u, err
+	return userStorage.FindByID(a.UserID)
 }

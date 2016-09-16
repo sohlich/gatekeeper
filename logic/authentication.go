@@ -52,10 +52,10 @@ func ActivateUserByToken(tkn string) error {
 	activity.Used = now
 	model.UpdateActivity(activity)
 	u, err := model.FindUserByID(activity.UserID)
-	u.Activated = true
 	if err != nil {
 		return errors.Wrap(err, "Cannot find user")
 	}
+	u.Activated = true
 	return model.SaveUser(u)
 }
 

@@ -9,6 +9,9 @@ import (
 
 var db *gorm.DB
 
+var userStorage UserManager
+var activityStorage ActivityManager
+
 type Table interface {
 	TableName() string
 }
@@ -30,6 +33,14 @@ func InitDB() (err error) {
 			db.AutoMigrate(val)
 		}
 	}
+
+	userStorage = &SqlUserManager{
+		db,
+	}
+	activityStorage = &SQLActivityManager{
+		db,
+	}
+
 	log.Println("Database tables OK")
 	return nil
 }
