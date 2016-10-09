@@ -28,6 +28,7 @@ func main() {
 	appMux.HandleFunc("/register", handlers.Register)
 	appMux.HandleFunc("/login", handlers.Login)
 	appMux.HandleFunc("/activate", handlers.ActivateUser)
+	appMux.HandleFunc("/logout", handlers.Logout)
 	server := manners.NewServer()
 	server.Handler = handlers.LoggingHandler(appMux)
 

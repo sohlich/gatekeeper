@@ -45,7 +45,7 @@ func (s *SqlUserManager) FindByID(id uint) (u *User, err error) {
 
 func (s *SqlUserManager) FindByUserID(userID string) (u *User, err error) {
 	u = &User{}
-	err = s.db.Where("userid = ?", userID).First(u).Error
+	err = s.db.Where("user_id = ?", userID).First(u).Error
 	return
 }
 
@@ -86,9 +86,8 @@ func CreateUser(u *User) (err error) {
 	return errors.Wrap(err, "Cannot create user")
 }
 
-func FindUserByUserid(userID string) (user User) {
-	db.Where("userid = ?", userID).First(&user)
-	return
+func FindUserByUserid(userID string) (*User, error) {
+	return userStorage.FindByUserID(userID)
 }
 
 func FindUserByID(id uint) (*User, error) {

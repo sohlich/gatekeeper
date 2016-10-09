@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/pkg/errors"
 	"github.com/sohlich/gatekeeper/logic"
 	"github.com/sohlich/gatekeeper/model"
 )
@@ -13,11 +14,19 @@ import (
 type UserHandler func(u *model.User, rw http.ResponseWriter)
 
 func Register(rw http.ResponseWriter, req *http.Request) {
-	UserHandlerFunc(registerHandler)(rw, req)
+	UserBodyHandler(registerHandler)(rw, req)
 }
 
 func Login(rw http.ResponseWriter, req *http.Request) {
-	UserHandlerFunc(loginHandler)(rw, req)
+	UserBodyHandler(loginHandler)(rw, req)
+}
+
+func Logout(rw http.ResponseWriter, req *http.Request) {
+	refTkn := req.Header.Get("token")
+	err := logic.LogoutUser(refTkn)
+	if err != nil {
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
 func ActivateUser(rw http.ResponseWriter, req *http.Request) {
@@ -35,7 +44,7 @@ func ActivateUser(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func UserHandlerFunc(h UserHandler) http.HandlerFunc {
+func UserBodyHandler(h UserHandler) http.HandlerFunc {
 	return func(rw http.ResponseWriter, req *http.Request) {
 		user := &model.User{}
 		bytes, err := ioutil.ReadAll(req.Body)
@@ -53,12 +62,20 @@ func UserHandlerFunc(h UserHandler) http.HandlerFunc {
 }
 
 func loginHandler(u *model.User, rw http.ResponseWriter) {
-	err := logic.LoginUser(u)
+	user, err := logic.LoginUser(u)
 	if err != nil {
 		log.Println("Login failed for user %s\n", u)
 		rw.WriteHeader(http.StatusForbidden)
 		return
 	}
+	tkn, err := logic.ObtainToken(user)
+	if err != nil {
+		log.Println("Cannot obtain token %+v \n", errors.Cause(err))
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	rw.Header().Set("token", tkn)
+	rw.WriteHeader(http.StatusOK)
 }
 
 func registerHandler(u *model.User, rw http.ResponseWriter) {

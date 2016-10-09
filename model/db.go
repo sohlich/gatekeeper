@@ -11,6 +11,7 @@ var db *gorm.DB
 
 var userStorage UserManager
 var activityStorage ActivityManager
+var tokenStorage TokenManager
 
 type Table interface {
 	TableName() string
@@ -38,6 +39,9 @@ func InitDB() (err error) {
 		db,
 	}
 	activityStorage = &SQLActivityManager{
+		db,
+	}
+	tokenStorage = &SQLTokenManager{
 		db,
 	}
 
